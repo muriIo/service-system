@@ -5,9 +5,18 @@ import (
 	"fmt"
 )
 
+type Priority int
+
+const (
+	Normal Priority = iota
+	Urgency
+	Emergency
+)
+
 type Node struct {
-	value string
-	next  *Node
+	value    string
+	next     *Node
+	priority Priority
 }
 
 type Queue struct {
@@ -19,14 +28,33 @@ func (queue *Queue) isEmpty() bool {
 	return queue.front == nil
 }
 
-func (queue *Queue) enqueue(value string) {
-	newNode := &Node{value: value}
+func (queue *Queue) enqueue(value string, priority Priority) {
+	newNode := &Node{value: value, priority: priority}
 
-	if queue.isEmpty() == true {
+	if queue.isEmpty() {
 		queue.front = newNode
 		queue.rear = newNode
-	} else {
+
+		return
+	}
+
+	if newNode.priority == Normal {
 		queue.rear.next = newNode
+		queue.rear = newNode
+
+		return
+	}
+
+	currentNode := queue.front
+
+	for currentNode.next != nil && currentNode.next.priority >= priority {
+		currentNode = currentNode.next
+	}
+
+	newNode.next = currentNode.next
+	currentNode.next = newNode
+
+	if newNode.next == nil {
 		queue.rear = newNode
 	}
 }
@@ -46,12 +74,12 @@ func (queue *Queue) dequeue() (*Node, error) {
 	return dequeuedValue, nil
 }
 
-func (queue *Queue) peek() (string, error) {
+func (queue *Queue) peek() (*Node, error) {
 	if queue.isEmpty() == true {
-		return "", errors.New("Queue is empty")
+		return nil, errors.New("Queue is empty")
 	}
 
-	return queue.front.value, nil
+	return queue.front, nil
 }
 
 func (queue *Queue) length() int {
@@ -73,25 +101,23 @@ func (queue *Queue) length() int {
 func main() {
 	queue := &Queue{}
 
-	fmt.Println(queue.isEmpty())
-	fmt.Println(queue.peek())
-	fmt.Println(queue.dequeue())
+	queue.enqueue("josefina", Emergency)
+	queue.enqueue("josé", Normal)
+	queue.enqueue("marcos", Emergency)
+	queue.enqueue("maria", Urgency)
+	queue.enqueue("cláudio", Urgency)
 
-	queue.enqueue("josé")
-	queue.enqueue("maria")
-	queue.enqueue("cláudio")
-	queue.enqueue("josefina")
+	front, error := queue.peek()
 
-	fmt.Println(queue.length())
+	if error != nil {
+		return
+	}
 
-	fmt.Println(queue.peek())
-	fmt.Println(queue.dequeue())
-	fmt.Println(queue.peek())
-	fmt.Println(queue.dequeue())
-	fmt.Println(queue.length())
-	fmt.Println(queue.dequeue())
-	fmt.Println(queue.dequeue())
-	fmt.Println(queue.length())
-	fmt.Println(queue.dequeue())
-	fmt.Println(queue.length())
+	currentNode := front
+	fmt.Println(currentNode)
+
+	for currentNode.next != nil {
+		currentNode = currentNode.next
+		fmt.Println(currentNode)
+	}
 }
