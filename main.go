@@ -20,8 +20,9 @@ type Node struct {
 }
 
 type Queue struct {
-	front *Node
-	rear  *Node
+	front  *Node
+	rear   *Node
+	length int
 }
 
 func (queue *Queue) isEmpty() bool {
@@ -34,9 +35,12 @@ func (queue *Queue) enqueue(value string, priority Priority) {
 	if queue.isEmpty() {
 		queue.front = newNode
 		queue.rear = newNode
+		queue.length = 1
 
 		return
 	}
+
+	queue.length++
 
 	if newNode.priority == Normal {
 		queue.rear.next = newNode
@@ -71,6 +75,8 @@ func (queue *Queue) dequeue() (*Node, error) {
 		queue.rear = nil
 	}
 
+	queue.length--
+
 	return dequeuedValue, nil
 }
 
@@ -82,22 +88,6 @@ func (queue *Queue) peek() (*Node, error) {
 	return queue.front, nil
 }
 
-func (queue *Queue) length() int {
-	if queue.front == nil {
-		return 0
-	}
-
-	currentNode := queue.front
-	length := 0
-
-	for currentNode != nil {
-		currentNode = currentNode.next
-		length++
-	}
-
-	return length
-}
-
 func main() {
 	queue := &Queue{}
 
@@ -105,7 +95,9 @@ func main() {
 	queue.enqueue("josé", Normal)
 	queue.enqueue("marcos", Emergency)
 	queue.enqueue("maria", Urgency)
+	queue.dequeue()
 	queue.enqueue("cláudio", Urgency)
+	queue.dequeue()
 
 	front, error := queue.peek()
 
@@ -113,11 +105,6 @@ func main() {
 		return
 	}
 
-	currentNode := front
-	fmt.Println(currentNode)
-
-	for currentNode.next != nil {
-		currentNode = currentNode.next
-		fmt.Println(currentNode)
-	}
+	fmt.Println(front)
+	fmt.Println(queue.length)
 }
