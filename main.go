@@ -54,6 +54,22 @@ func (queue *Queue) peek() (string, error) {
 	return queue.front.value, nil
 }
 
+func (queue *Queue) length() int {
+	if queue.front == nil {
+		return 0
+	}
+
+	currentNode := queue.front
+	length := 0
+
+	for currentNode != nil {
+		currentNode = currentNode.next
+		length++
+	}
+
+	return length
+}
+
 func main() {
 	queue := &Queue{}
 
@@ -66,11 +82,16 @@ func main() {
 	queue.enqueue("cláudio")
 	queue.enqueue("josefina")
 
+	fmt.Println(queue.length())
+
 	fmt.Println(queue.peek())
 	fmt.Println(queue.dequeue())
 	fmt.Println(queue.peek())
 	fmt.Println(queue.dequeue())
+	fmt.Println(queue.length())
 	fmt.Println(queue.dequeue())
 	fmt.Println(queue.dequeue())
+	fmt.Println(queue.length())
 	fmt.Println(queue.dequeue())
+	fmt.Println(queue.length())
 }
